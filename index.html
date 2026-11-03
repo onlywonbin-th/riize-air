@@ -258,7 +258,7 @@ async function saveTicket(i){ // วาดตั๋วแนวนอนลง c
   x.fillStyle='#f3f6fb';x.fillRect(0,0,W,H);
   x.fillStyle=m.c;x.fillRect(0,0,W,20);
   const ci=await loadImg(t.img);
-  if(ci){const s=Math.min(290/ci.width,430/ci.height),w=ci.width*s,h=ci.height*s;const cy=40+(430-h)/2;x.save();rrect(x,40,cy,w,h,w*0.055);x.clip();x.drawImage(ci,40,cy,w,h);x.restore()}
+  if(ci){const s=Math.min(290/ci.width,430/ci.height),w=ci.width*s,h=ci.height*s;const cy=40+(430-h)/2;x.save();rrect(x,40,cy,w,h,w*0.065);x.clip();x.drawImage(ci,40,cy,w,h);x.restore()}
   x.fillStyle=m.c;x.font='700 20px Kanit,sans-serif';x.fillText('✦ RIIZE AIR · BOARDING PASS',380,95);
   x.fillStyle='#0e1b3d';x.font='800 84px Kanit,sans-serif';x.fillText('RZ '+(100+i),380,185);
   const f=(l,v,a,b,sz=34)=>{x.fillStyle='#6b7a99';x.font='300 18px Kanit,sans-serif';x.fillText(l,a,b);x.fillStyle='#0e1b3d';x.font='700 '+sz+'px Kanit,sans-serif';x.fillText(v,a,b+40)};

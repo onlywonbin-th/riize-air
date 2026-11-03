@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
 <title>RIIZE AIR · Certificate Flight</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700;800&display=swap" rel="stylesheet">
@@ -110,6 +110,13 @@ html{overflow-anchor:none}
  .msg .o{font-size:12px;margin-bottom:6px}
  #flight.ann .cert,#flight.ann #plane{display:none}
 }
+html{height:100%;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{height:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+body.flying{overflow:hidden}
+.ticket,.passport,button,.up{-webkit-user-select:none;user-select:none}
+#flight{overflow:hidden;overscroll-behavior:contain}
+.msg{max-height:38vh;overflow-y:auto;overscroll-behavior:contain}
+#flight .cert{border:0;box-shadow:0 10px 30px #0006}
 </style>
 </head>
 <body>
@@ -138,7 +145,7 @@ html{overflow-anchor:none}
   </div>
   <div id="status" class="sub" role="status" aria-live="polite" style="font-weight:300"></div>
   <div id="tickets"></div>
-  <footer class="credit">by: onlywonbin th</footer>
+  <footer class="credit">BY: ONLYWONBIN TH</footer>
 </main>
 
 <div id="flight" role="dialog" aria-live="polite" aria-label="เที่ยวบิน">
@@ -157,22 +164,22 @@ html{overflow-anchor:none}
 <script>
 const MEMBERS=[
  {id:'shotaro',c:'#ff6a3d',n:'Shotaro',
-  o:'브리즈 !\n我爱你\n愛してる\ni love you\nje t’aime\nti amo\nIch liebe dich\n그리고\n\n사랑해 ♡',
-  th:'บรีซ!\nฉันรักเธอ (จีน ญี่ปุ่น อังกฤษ ฝรั่งเศส อิตาลี เยอรมัน)\nแล้วก็... ฉันรักเธอนะ ♡ (เกาหลี)'},
+  o:'',
+  th:'🧋: บรีซ!\nฉันรักเธอ 我爱你 愛してる i love you je t’aime ti amo Ich liebe dich\nแล้วก็... ฉันรักเธอนะ ♡ (사랑해)'},
  {id:'eunseok',c:'#3d7bff',n:'Eunseok',
-  o:'Gimana bikin hati batuku deg-deg-an? Cheese? Bukan! Jazz? Bukan!... Only BRIIZE ~♡',
-  th:'ทำยังไงให้หัวใจหินของฉันเต้นตึกตักได้นะ? ชีสเหรอ? ไม่ใช่! แจ๊สเหรอ? ไม่ใช่!... มีแค่ BRIIZE เท่านั้น ~♡'},
+  o:'',
+  th:'🪨: ทำยังไงให้หัวใจหินของฉันเต้นตึกตักได้นะ? ชีสเหรอ? ไม่ใช่! แจ๊สเหรอ? ไม่ใช่!... มีแค่ BRIIZE เท่านั้น ~♡'},
  {id:'sungchan',c:'#2fbf71',n:'Sungchan',
-  o:'브리즈를 위해 떵차니가 보내는 사랑의 한마디!\n브리즈 나한테 푹 빠졍! 아랏뜌??!!🧡🧡',
-  th:'คำรักจากต็องชานีที่ส่งถึงบรีซ!\nบรีซหลงรักฉันให้หัวปักหัวปำเลยนะ! รู้แล้วใช่มั้ยย??!! 🧡🧡'},
+  o:'',
+  th:'🦌: คำบอกรักจากตองชานีที่ส่งถึงบรีซ!\nบรีซหลงรักฉันให้หัวปักหัวปำเลยนะ! รู้แล้วใช่มั้ยย??!! 🧡🧡'},
  {id:'wonbin',c:'#9a5cff',n:'Wonbin',o:'',
-  th:'ฮัลโหล? อยู่ไหนน? อยู่ในใจผมหรอ? อา อะไรกันเนี่ย~ ผมกำลังเข้าไปในใจของทุกคนนะ คลาดกันซะแล้ว เดี๋ยวผมจะรีบไปหาตอนนี้เลย ไว้เจอกันในใจบรีซนะ~'},
+  th:'🎸: ฮัลโหล? อยู่ไหนน? อยู่ในใจผมหรอ? อา อะไรกันเนี่ย~ ผมกำลังเข้าไปในใจของทุกคนนะ คลาดกันซะแล้ว เดี๋ยวผมจะรีบไปหาตอนนี้เลย ไว้เจอกันในใจบรีซนะ~'},
  {id:'sohee',c:'#ff5fa2',n:'Sohee',
-  o:'hey 희주 뭐랄까... 나 필이 짜르르 왔어\n소희 말하는 행복이란 이런 거 아닐까?\n희주와 내가 너무나 미칠 것처럼 사랑을 하고 있다는 거\n브리즈 사랑해!',
-  th:'เฮ้ ฮีจู จะว่ายังไงดีนะ... ฉันรู้สึกวาบขึ้นมาเลย\nความสุขที่โซฮีพูดถึงก็คงเป็นแบบนี้แหละมั้ง?\nคือการที่ฮีจูกับฉันรักกันแทบบ้าเลยไงล่ะ\nบรีซ รักนะ!'},
+  o:'',
+  th:'💂🏻‍♂️: เฮ้ ฮีจู จะว่ายังไงดีนะ... ฉันรู้สึกเหมือนมีประกายไฟแล่นวาบขึ้นมาเลย\nความสุขที่โซฮีพูดถึงก็คงเป็นแบบนี้แหละมั้ง?\nคือการที่ฮีจูกับฉันรักกันแทบบ้าเลยไงล่ะ\nบรีซ รักนะ!'},
  {id:'anton',c:'#e6a800',n:'Anton',
-  o:'BRIIZE, winter has truly arrived now ☃️🌨️\nWhen it\'s cold, come into my wide embrace.\nInside of me ( in my heart ) is BRIIZE',
-  th:'บรีซ ฤดูหนาวมาถึงแล้วจริง ๆ นะ ☃️🌨️\nถ้าหนาวก็เข้ามาในอ้อมกอดกว้าง ๆ ของฉันได้เลย\nข้างในตัวฉัน (ในหัวใจของฉัน) มีบรีซอยู่'}
+  o:'',
+  th:'🦕: บรีซ ฤดูหนาวมาถึงแล้วจริง ๆ นะ ☃️🌨️\nถ้าหนาวก็เข้ามาในอ้อมกอดกว้าง ๆ ของฉันได้เลย\nข้างในหัวใจของฉัน มีบรีซอยู่'}
 ];
 const av=(m,c='')=>`<i class="av ${c}" style="--c:${m.c}"><img src="img/${m.id}.png" alt="" onload="this.parentNode.classList.add('ok')" onerror="this.remove()"><strong>${m.n[0]}</strong></i>`;
 const seatM=t=>MEMBERS['ABCDEF'.indexOf(t.seat.slice(-1))]||MEMBERS[0];
@@ -243,41 +250,42 @@ $('tickets').onkeydown=e=>{if(e.key==='Enter'&&e.target.classList.contains('tick
 
 const loadImg=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
 const rrect=(x,a,b,w,h,r)=>{x.beginPath();x.roundRect?x.roundRect(a,b,w,h,r):x.rect(a,b,w,h)};
-async function saveTicket(i){ // วาดตั๋วลง canvas (แนวตั้งกะทัดรัด เหมาะกับมือถือ) แล้วดาวน์โหลดเป็น PNG
+async function saveTicket(i){ // วาดตั๋วแนวนอนลง canvas แล้วดาวน์โหลดเป็น PNG
   const t=tickets[i];if(!t)return;const m=seatM(t);
   try{await document.fonts.load('800 40px Kanit');await document.fonts.load('300 20px Kanit')}catch(e){}
-  const W=900,H=800,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  x.save();rrect(x,0,0,W,H,44);x.clip();
+  const W=1200,H=500,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.save();rrect(x,0,0,W,H,40);x.clip();
   x.fillStyle='#f3f6fb';x.fillRect(0,0,W,H);
   x.fillStyle=m.c;x.fillRect(0,0,W,20);
   const ci=await loadImg(t.img);
-  if(ci){const s=Math.min(260/ci.width,420/ci.height),w=ci.width*s,h=ci.height*s,cx=40,cy=50+(420-h)/2;
-    x.fillStyle='#fff';x.fillRect(cx-6,cy-6,w+12,h+12);x.drawImage(ci,cx,cy,w,h)}
-  x.fillStyle=m.c;x.font='700 18px Kanit,sans-serif';x.fillText('✦ RIIZE AIR · BOARDING PASS',330,92);
-  x.fillStyle='#0e1b3d';x.font='800 76px Kanit,sans-serif';x.fillText('RZ '+(100+i),330,168);
-  const f=(l,v,a,b,sz=32,mw=530)=>{x.fillStyle='#6b7a99';x.font='300 18px Kanit,sans-serif';x.fillText(l,a,b);x.fillStyle='#0e1b3d';x.font='700 '+sz+'px Kanit,sans-serif';x.fillText(v,a,b+38,mw)};
-  f('PASSENGER',(load('name','')||'RIIZE FAN').toUpperCase(),330,235);
-  f('SEAT',t.seat,330,330,32,200);f('DATE',t.date,560,330,32,300);
-  if(t.no)f('CERT NO.',t.no,330,420,24);
-  x.strokeStyle='#c9d4e8';x.lineWidth=3;x.setLineDash([10,10]);x.beginPath();x.moveTo(40,510);x.lineTo(860,510);x.stroke();x.setLineDash([]);
-  x.fillStyle=m.c+'33';x.beginPath();x.arc(200,640,80,0,7);x.fill();
-  const pi=await loadImg('img/'+m.id+'.png');
-  if(pi){const sh=180,sw=pi.width*sh/pi.height;x.drawImage(pi,200-sw/2,720-sh,sw,sh)}
-  else{x.fillStyle=m.c;x.beginPath();x.arc(200,640,80,0,7);x.fill();x.fillStyle='#fff';x.font='800 72px Kanit,sans-serif';x.textAlign='center';x.fillText(m.n[0],200,666)}
-  x.textAlign='center';x.fillStyle='#0e1b3d';x.font='700 30px Kanit,sans-serif';x.fillText(m.n.toUpperCase(),200,768);
+  if(ci){const s=Math.min(290/ci.width,430/ci.height),w=ci.width*s,h=ci.height*s;x.drawImage(ci,40,40+(430-h)/2,w,h)}
+  x.fillStyle=m.c;x.font='700 20px Kanit,sans-serif';x.fillText('✦ RIIZE AIR · BOARDING PASS',380,95);
+  x.fillStyle='#0e1b3d';x.font='800 84px Kanit,sans-serif';x.fillText('RZ '+(100+i),380,185);
+  const f=(l,v,a,b,sz=34)=>{x.fillStyle='#6b7a99';x.font='300 18px Kanit,sans-serif';x.fillText(l,a,b);x.fillStyle='#0e1b3d';x.font='700 '+sz+'px Kanit,sans-serif';x.fillText(v,a,b+40)};
+  f('PASSENGER',(load('name','')||'RIIZE FAN').toUpperCase(),380,240);
+  f('SEAT',t.seat,380,335);f('DATE',t.date,540,335);
+  if(t.no)f('CERT NO.',t.no,380,420,26);
   let h=0;for(const ch of (t.no||t.seat+i))h=(h*31+ch.charCodeAt(0))>>>0;
-  x.fillStyle='#0e1b3d';let bx=400;
-  for(let k=0;k<80&&bx<860;k++){h=(h*1103515245+12345)>>>0;const w=2+(h>>>16)%5;if(k%2===0)x.fillRect(bx,555,w,100);bx+=w+1}
-  x.textAlign='left';x.font='800 44px Kanit,sans-serif';x.fillText('SEAT '+t.seat,400,722);
-  x.textAlign='right';x.fillStyle='#6b7a99';x.font='300 16px Kanit,sans-serif';x.fillText('by: onlywonbin th',860,776);x.textAlign='left';
+  x.fillStyle='#0e1b3d';let bx=740;
+  for(let k=0;k<40&&bx<880;k++){h=(h*1103515245+12345)>>>0;const w=2+(h>>>16)%5;if(k%2===0)x.fillRect(bx,345,w,95);bx+=w+1}
+  x.strokeStyle='#c9d4e8';x.lineWidth=3;x.setLineDash([10,10]);x.beginPath();x.moveTo(900,40);x.lineTo(900,460);x.stroke();x.setLineDash([]);
+  x.fillStyle=m.c+'33';x.beginPath();x.arc(1050,200,88,0,7);x.fill();
+  const pi=await loadImg('img/'+m.id+'.png');
+  if(pi){const sh=195,sw=pi.width*sh/pi.height;x.drawImage(pi,1050-sw/2,288-sh,sw,sh)}
+  else{x.fillStyle=m.c;x.beginPath();x.arc(1050,200,88,0,7);x.fill();x.fillStyle='#fff';x.font='800 80px Kanit,sans-serif';x.textAlign='center';x.fillText(m.n[0],1050,228)}
+  x.textAlign='center';x.fillStyle='#0e1b3d';x.font='700 34px Kanit,sans-serif';x.fillText(m.n.toUpperCase(),1050,345);
+  x.fillStyle='#6b7a99';x.font='300 22px Kanit,sans-serif';x.fillText('SEAT '+t.seat,1050,382);
+  x.font='300 16px Kanit,sans-serif';x.fillText('BY: ONLYWONBIN TH',1050,455);x.textAlign='left';
   x.globalCompositeOperation='destination-out';
-  x.beginPath();x.arc(0,510,24,0,7);x.fill();x.beginPath();x.arc(W,510,24,0,7);x.fill();
+  x.beginPath();x.arc(900,0,24,0,7);x.fill();x.beginPath();x.arc(900,H,24,0,7);x.fill();
   x.restore();
   c.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='riize-air-ticket-'+(100+i)+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)},'image/png');
 }
 let timer,audio;
+const player=new Audio();player.preload='auto';
+const SILENT='data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 const wait=ms=>new Promise(r=>timer=setTimeout(r,ms));
-function stop(){clearTimeout(timer);if(audio){audio.pause();audio=null}speechSynthesis.cancel();$('flight').classList.remove('on')}
+function stop(){clearTimeout(timer);player.pause();speechSynthesis.cancel();$('flight').classList.remove('on');document.body.classList.remove('flying')}
 $('skip').onclick=stop;
 function announce(m){
   return new Promise(done=>{
@@ -286,21 +294,29 @@ function announce(m){
     $('detail').textContent='';
     $('msg').innerHTML=(m.o?`<div class="o">${m.o}</div>`:'')+`<div class="th">${m.th}</div>`;$('msg').style.display='block';
     let ended=false,fb=false;const fin=()=>{if(!ended){ended=true;done()}};
-    const fallback=()=>{if(fb)return;fb=true; // ไม่มีไฟล์เสียง: ใช้เสียงอ่านของเบราว์เซอร์
-      const u=new SpeechSynthesisUtterance(m.th);u.lang='th-TH';u.onend=fin;u.onerror=fin;
-      speechSynthesis.speak(u);setTimeout(fin,9000+m.th.length*100)};
-    audio=new Audio('audio/'+m.id+'.mp3');
-    audio.onended=fin;audio.onerror=fallback;
-    audio.play().catch(fallback);
+    const fallback=e=>{if(fb)return;fb=true;
+      if(e&&e.name==='NotAllowedError'){ // เบราว์เซอร์ยังบล็อก: ให้แตะปุ่มเพื่อเล่น
+        $('detail').innerHTML='<button class="primary" id="pb">🔊 แตะเพื่อฟังเสียงประกาศ</button>';
+        $('pb').onclick=()=>{player.play().then(()=>{$('detail').textContent=''}).catch(()=>{})};
+        setTimeout(fin,20000);return}
+      $('detail').textContent='(ไม่พบ/เล่นไฟล์ audio/'+m.id+'.mp3 ไม่ได้ · ใช้เสียงอ่านแทน)';
+      try{const u=new SpeechSynthesisUtterance(m.th);u.lang='th-TH';u.onend=fin;u.onerror=fin;speechSynthesis.speak(u)}catch(err){}
+      setTimeout(fin,9000+m.th.length*100)};
+    player.onended=fin;player.onerror=()=>fallback();
+    player.src='audio/'+m.id+'.mp3';
+    player.play().catch(fallback);
   });
 }
 async function fly(i){
   const t=tickets[i];if(!t)return;
   const m=MEMBERS[Math.floor(Math.random()*MEMBERS.length)];
   $('flight').style.setProperty('--m',m.c);
+  // ปลดล็อกเสียงตอนแตะตั๋ว (มือถือบล็อกเสียงที่เริ่มเองทีหลัง)
+  player.onended=null;player.onerror=null;player.src=SILENT;player.play().catch(()=>{});
+  try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(' '))}catch(e){}
   $('fcert').src=t.img;$('crew').innerHTML=MEMBERS.map(x=>av(x)).join('');
   $('msg').style.display='none';$('who').style.display='none';$('tp').style.left='0';
-  $('flight').classList.remove('ann');$('flight').classList.add('on');
+  $('flight').classList.remove('ann');$('flight').classList.add('on');document.body.classList.add('flying');
   for(let k=0;k<STEPS.length;k++){
     if(!$('flight').classList.contains('on'))return;
     $('step').textContent=STEPS[k][0];$('detail').textContent=STEPS[k][1];

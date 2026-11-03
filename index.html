@@ -208,7 +208,7 @@ function render(){
     <button class="x" data-del="${i}" aria-label="ลบตั๋ว">×</button>
    </div>`}).join(''):'<div class="empty">ยังไม่มีตั๋ว อัปรูป certificate เพื่อออกตั๋วใบแรก</div>';
 }
-function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,1000/im.width),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8))};im.src=r.result};r.readAsDataURL(file)})}
+function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,1000/im.width),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8))};im.src=r.result};r.readAsDataURL(file)})}
 async function readCert(url){
   const {data:{text}}=await Tesseract.recognize(url,'eng');
   const t=text.toUpperCase().replace(/\s+/g,' ');
@@ -258,7 +258,7 @@ async function saveTicket(i){ // วาดตั๋วแนวนอนลง c
   x.fillStyle='#f3f6fb';x.fillRect(0,0,W,H);
   x.fillStyle=m.c;x.fillRect(0,0,W,20);
   const ci=await loadImg(t.img);
-  if(ci){const s=Math.min(290/ci.width,430/ci.height),w=ci.width*s,h=ci.height*s;x.drawImage(ci,40,40+(430-h)/2,w,h)}
+  if(ci){const s=Math.min(290/ci.width,430/ci.height),w=ci.width*s,h=ci.height*s;const cy=40+(430-h)/2;x.save();rrect(x,40,cy,w,h,w*0.055);x.clip();x.drawImage(ci,40,cy,w,h);x.restore()}
   x.fillStyle=m.c;x.font='700 20px Kanit,sans-serif';x.fillText('✦ RIIZE AIR · BOARDING PASS',380,95);
   x.fillStyle='#0e1b3d';x.font='800 84px Kanit,sans-serif';x.fillText('RZ '+(100+i),380,185);
   const f=(l,v,a,b,sz=34)=>{x.fillStyle='#6b7a99';x.font='300 18px Kanit,sans-serif';x.fillText(l,a,b);x.fillStyle='#0e1b3d';x.font='700 '+sz+'px Kanit,sans-serif';x.fillText(v,a,b+40)};

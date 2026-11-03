@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RIIZE AIR · Certificate Flight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<style>
+:root{--ink:#0e1b3d;--sky:#9cc8ff;--orange:#ff5a1f;--paper:#f3f6fb;--line:#c9d4e8;--bg:#dfe7f5}
+@media (prefers-color-scheme:dark){:root{--bg:#081027;--paper:#16254d;--ink:#eaf1ff;--line:#2e427a}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Kanit,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:env(safe-area-inset-top) 16px calc(40px + env(safe-area-inset-bottom))}
+main{max-width:520px;margin:0 auto}
+h1{font-weight:800;font-size:28px;margin:22px 0 2px;letter-spacing:.5px}
+p.sub{margin:0 0 18px;font-weight:300}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;font-weight:500}
+button:focus-visible,label:focus-within,.ticket:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.primary{background:var(--orange);color:#fff}
+.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+/* passport */
+.passport{background:#0b2a7a;color:#fff;border-radius:6px 22px 22px 6px;padding:22px;position:relative;box-shadow:0 10px 24px #0004;transition:.4s}
+.passport .cover{text-align:center;cursor:pointer}
+.passport .cover b{display:block;font-size:30px;font-weight:800;letter-spacing:2px}
+.passport .cover small{display:inline-block;background:#fff;color:#0b2a7a;padding:2px 14px;margin:6px 0 14px;font-weight:500}
+.passport svg{width:110px;height:110px}
+.passport .pages{display:none}
+.passport.open{background:var(--paper);color:var(--ink)}
+.passport.open .cover{display:none}
+.passport.open .pages{display:block}
+.passport input[type=text]{width:100%;font:inherit;font-weight:700;font-size:20px;padding:6px 0;border:0;border-bottom:2px solid var(--ink);background:transparent;color:inherit}
+.stamps{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;min-height:70px}
+.stamp{border:2.5px solid var(--orange);color:var(--orange);border-radius:50%;width:78px;height:78px;display:grid;place-content:center;text-align:center;font-size:10px;font-weight:700;transform:rotate(-12deg);line-height:1.2}
+.stamp:nth-child(even){transform:rotate(9deg);border-color:#2a6fff;color:#2a6fff}
+.stamps em{font-style:normal;font-weight:300;opacity:.7;align-self:center}
+/* tickets */
+.bar{display:flex;gap:10px;align-items:center;margin:26px 0 12px}
+.bar h2{margin:0;flex:1;font-size:18px}
+.up{background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer}
+.up input{position:absolute;opacity:0;width:1px;height:1px}
+.ticket{display:grid;grid-template-columns:86px 1fr 70px;background:var(--paper);border-radius:16px;margin-bottom:12px;overflow:hidden;cursor:pointer;box-shadow:0 4px 12px #0002;border:1px solid var(--line);position:relative;transition:transform .15s}
+.ticket:active{transform:scale(.98)}
+.ticket>img{width:86px;height:100%;object-fit:cover;display:block}
+.ticket .info{padding:12px 14px;border-right:2px dashed var(--line)}
+.ticket .info b{display:block;font-size:17px;font-weight:700}
+.ticket .info span{display:block;font-size:12px;font-weight:300;word-break:break-all}
+.ticket .go{display:grid;place-content:center;text-align:center;font-size:12px;font-weight:700;color:var(--orange)}
+.ticket .go svg{width:26px;height:26px;margin:auto}
+.ticket .x{position:absolute;top:4px;right:4px;padding:0 7px;background:#0000;font-size:16px;color:var(--ink);opacity:.5}
+.empty{padding:26px;text-align:center;border:2px dashed var(--line);border-radius:16px;font-weight:300}
+/* flight */
+#flight{position:fixed;inset:0;background:linear-gradient(#0a1a46,color-mix(in srgb,var(--m,#2a5cc4) 60%,#0a1a46) 70%,#9cc8ff);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center;z-index:9}
+#flight.on{display:flex}
+#flight .cert{width:min(46vw,200px);border-radius:14px;box-shadow:0 10px 30px #0006}
+#plane{width:84px;height:84px;transition:transform 1.2s ease}
+#step{font-size:26px;font-weight:700;min-height:40px}
+#detail{font-weight:300;min-height:48px;max-width:360px}
+.track{width:min(86vw,360px);height:8px;background:#fff3;border-radius:6px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--m,var(--orange));transition:width 1s linear}
+.badge{background:#fff;color:#0b2a7a;border-radius:99px;padding:6px 18px;font-weight:700;display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.ticket{border-top:4px solid var(--c)}
+.ticket .info{position:relative;padding-right:56px}
+.air{display:block;font-size:9px;letter-spacing:1px;font-weight:700;color:var(--c);margin-bottom:2px}
+.av{--s:46px;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);display:inline-grid;place-items:center;position:relative;color:#fff;font-weight:800;font-style:normal;flex:none}
+.av img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:135%;width:auto;pointer-events:none}
+.av.ok{background:color-mix(in srgb,var(--c) 30%,transparent)}
+.av.ok strong{display:none}
+.av.stk{position:absolute;right:6px;bottom:6px;--s:42px}
+.av.big{--s:104px;font-size:40px}
+#flight{overflow-y:auto;justify-content:safe center}
+#flight>*{position:relative}
+#flight>.clouds{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.clouds i{position:absolute;left:-220px;width:150px;height:46px;border-radius:99px;background:#fff5;animation:drift 16s linear infinite}
+.clouds i:nth-child(1){top:12%}
+.clouds i:nth-child(2){top:48%;width:200px;animation-duration:22s;animation-delay:-8s}
+.clouds i:nth-child(3){top:78%;animation-duration:19s;animation-delay:-3s}
+@keyframes drift{to{transform:translateX(calc(100vw + 450px))}}
+#flight .cert{border:6px solid #fff;transform:rotate(-3deg)}
+.crew{display:flex;gap:10px;justify-content:center;align-items:flex-end;min-height:56px}
+.crew:has(.big){margin-top:34px}
+.crew .av{--s:44px;animation:bob 1.6s ease-in-out infinite}
+.crew .av:nth-child(2n){animation-delay:-.5s}
+.crew .av:nth-child(3n){animation-delay:-1s}
+.crew .av.big{--s:104px;animation-duration:1.2s}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.msg{display:none;width:min(92vw,380px);background:#fff;color:#0b2a7a;border:3px dashed var(--m);border-radius:22px;padding:14px 18px;animation:pop .35s ease}
+.msg .o{font-size:14px;font-weight:300;white-space:pre-line;opacity:.8;margin-bottom:8px}
+.msg .th{font-weight:500;white-space:pre-line}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.track{position:relative;overflow:visible}
+.track i{border-radius:6px}
+#tp{position:absolute;top:-24px;left:0;width:24px;height:24px;transform:translateX(-50%) rotate(90deg);transition:left 1s linear}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.credit{margin-top:34px;text-align:center;font-size:13px;font-weight:300;letter-spacing:.5px;opacity:.7}
+.save{margin-top:6px;padding:4px 10px;font-size:12px;border-radius:8px;background:transparent;border:1.5px solid var(--c);color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <h1>RIIZE AIR</h1>
+  <p class="sub">อัปใบ certificate โหวต MAMA แล้วกดตั๋วเพื่อขึ้นเครื่อง</p>
+
+  <section class="passport" id="passport" aria-label="พาสปอร์ต">
+    <div class="cover" id="cover" tabindex="0" role="button" aria-label="เปิดพาสปอร์ต">
+      <b>PASSPORT</b><small>RIIZE FLIGHT</small>
+      <div><svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="50" cy="50" r="46"/><path fill="#fff" stroke="none" d="M50 14l4 22 32 18v6l-32-8v16l9 7v5l-13-3-13 3v-5l9-7V52l-32 8v-6l32-18z"/></svg></div>
+      <div style="font-weight:300;margin-top:8px">แตะเพื่อเปิด</div>
+    </div>
+    <div class="pages">
+      <label for="name" style="font-size:12px;font-weight:300">ชื่อผู้โดยสาร</label>
+      <input type="text" id="name" placeholder="ใส่ชื่อของคุณ" maxlength="28">
+      <div style="margin-top:14px;font-size:12px;font-weight:300">ตราประทับ</div>
+      <div class="stamps" id="stamps"></div>
+      <button class="ghost" id="close" style="margin-top:12px">ปิดพาสปอร์ต</button>
+    </div>
+  </section>
+
+  <div class="bar">
+    <h2>ตั๋วของฉัน</h2>
+    <label class="up">+ อัปรูป certificate<input type="file" id="file" accept="image/*" multiple></label>
+  </div>
+  <div id="status" class="sub" role="status" aria-live="polite" style="font-weight:300"></div>
+  <div id="tickets"></div>
+  <footer class="credit">BY: ONLYWONBIN TH</footer>
+</main>
+
+<div id="flight" role="dialog" aria-live="polite" aria-label="เที่ยวบิน">
+  <div class="clouds"><i></i><i></i><i></i></div>
+  <img class="cert" id="fcert" alt="certificate">
+  <div class="crew" id="crew"></div>
+  <svg id="plane" viewBox="0 0 100 100"><path fill="#fff" d="M50 8l5 26 38 22v7l-38-9v18l11 8v6l-16-4-16 4v-6l11-8V54l-38 9v-7l38-22z"/></svg>
+  <div id="step"></div>
+  <div class="badge" id="who"></div>
+  <div class="msg" id="msg"></div>
+  <div id="detail"></div>
+  <div class="track"><i id="bar"></i><svg id="tp" viewBox="0 0 100 100"><path fill="#fff" d="M50 8l5 26 38 22v7l-38-9v18l11 8v6l-16-4-16 4v-6l11-8V54l-38 9v-7l38-22z"/></svg></div>
+  <button class="ghost" id="skip" style="color:#fff;border-color:#fff8">ยกเลิกเที่ยวบิน</button>
+</div>
+
+<script>
+const MEMBERS=[
+ {id:'shotaro',c:'#ff6a3d',n:'Shotaro',
+  o:'',
+  th:'🧋: บรีซ!\nฉันรักเธอ 我爱你 愛してる i love you je t’aime ti amo Ich liebe dich\nแล้วก็... ฉันรักเธอนะ ♡ (사랑해)'},
+ {id:'eunseok',c:'#3d7bff',n:'Eunseok',
+  o:'',
+  th:'🪨: ทำยังไงให้หัวใจหินของฉันเต้นตึกตักได้นะ? ชีสเหรอ? ไม่ใช่! แจ๊สเหรอ? ไม่ใช่!... มีแค่ BRIIZE เท่านั้น ~♡'},
+ {id:'sungchan',c:'#2fbf71',n:'Sungchan',
+  o:'',
+  th:'🦌: คำบอกรักจากตองชานีที่ส่งถึงบรีซ!\nบรีซหลงรักฉันให้หัวปักหัวปำเลยนะ! รู้แล้วใช่มั้ยย??!! 🧡🧡'},
+ {id:'wonbin',c:'#9a5cff',n:'Wonbin',o:'',
+  th:'🎸: ฮัลโหล? อยู่ไหนน? อยู่ในใจผมหรอ? อา อะไรกันเนี่ย~ ผมกำลังเข้าไปในใจของทุกคนนะ คลาดกันซะแล้ว เดี๋ยวผมจะรีบไปหาตอนนี้เลย ไว้เจอกันในใจบรีซนะ~'},
+ {id:'sohee',c:'#ff5fa2',n:'Sohee',
+  o:'',
+  th:'💂🏻‍♂️: เฮ้ ฮีจู จะว่ายังไงดีนะ... ฉันรู้สึกเหมือนมีประกายไฟแล่นวาบขึ้นมาเลย\nความสุขที่โซฮีพูดถึงก็คงเป็นแบบนี้แหละมั้ง?\nคือการที่ฮีจูกับฉันรักกันแทบบ้าเลยไงล่ะ\nบรีซ รักนะ!'},
+ {id:'anton',c:'#e6a800',n:'Anton',
+  o:'',
+  th:'🦕: บรีซ ฤดูหนาวมาถึงแล้วจริง ๆ นะ ☃️🌨️\nถ้าหนาวก็เข้ามาในอ้อมกอดกว้าง ๆ ของฉันได้เลย\nข้างในหัวใจของฉัน มีบรีซอยู่'}
+];
+const av=(m,c='')=>`<i class="av ${c}" style="--c:${m.c}"><img src="img/${m.id}.png" alt="" onload="this.parentNode.classList.add('ok')" onerror="this.remove()"><strong>${m.n[0]}</strong></i>`;
+const seatM=t=>MEMBERS['ABCDEF'.indexOf(t.seat.slice(-1))]||MEMBERS[0];
+const STEPS=[
+ ['เช็กอิน','ตรวจ certificate และพาสปอร์ต'],
+ ['ขึ้นเครื่อง','กรุณานั่งประจำที่และรัดเข็มขัด'],
+ ['เครื่องออกตัว','กำลังขึ้นสู่ท้องฟ้า'],
+ ['ระดับความสูงเดินทาง','บินนิ่งแล้ว เพลิดเพลินกับการเดินทาง'],
+ ['เสียงประกาศจากกัปตัน',''],
+ ['กำลังร่อนลง','เตรียมตัวลงจากเครื่อง'],
+ ['ถึงที่หมายแล้ว','ประทับตราลงพาสปอร์ตเรียบร้อย']
+];
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert('พื้นที่เก็บข้อมูลเต็ม ลองลบตั๋วเก่าก่อน')}};
+let tickets=load('tickets',[]), stamps=load('stamps',[]);
+
+function render(){
+  $('name').value=load('name','');
+  $('stamps').innerHTML=stamps.length?stamps.map(s=>`<div class="stamp" style="color:${s.c||'#ff5a1f'};border-color:${s.c||'#ff5a1f'}">RIIZE AIR<br>${s.date}<br>${s.who}</div>`).join(''):'<em>ยังไม่มีตราประทับ บินครั้งแรกกันเลย</em>';
+  $('tickets').innerHTML=tickets.length?tickets.map((t,i)=>{const m=seatM(t);return `
+   <div class="ticket" tabindex="0" role="button" data-i="${i}" style="--c:${m.c}" aria-label="ขึ้นเครื่อง ตั๋ว ${t.seat}">
+    <img src="${t.img}" alt="certificate">
+    <div class="info"><small class="air">✦ RIIZE AIR · BOARDING PASS</small><b>RZ ${String(100+i).padStart(3,'0')}</b><span>ที่นั่ง ${t.seat} · ${t.date}</span>${t.no?`<span>No. ${t.no}</span>`:''}<button class="save" data-save="${i}">⬇ บันทึกตั๋ว</button>${av(m,'stk')}</div>
+    <div class="go"><svg viewBox="0 0 100 100"><path fill="currentColor" d="M50 8l5 26 38 22v7l-38-9v18l11 8v6l-16-4-16 4v-6l11-8V54l-38 9v-7l38-22z"/></svg>ขึ้นเครื่อง</div>
+    <button class="x" data-del="${i}" aria-label="ลบตั๋ว">×</button>
+   </div>`}).join(''):'<div class="empty">ยังไม่มีตั๋ว อัปรูป certificate เพื่อออกตั๋วใบแรก</div>';
+}
+function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,1000/im.width),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8))};im.src=r.result};r.readAsDataURL(file)})}
+async function readCert(url){
+  const {data:{text}}=await Tesseract.recognize(url,'eng');
+  const t=text.toUpperCase().replace(/\s+/g,' ');
+  const hits=['VOTING CERTIFICATE','MAMA','MNET PLUS'].filter(k=>t.includes(k)).length;
+  const m=t.match(/NO\.?\s*([A-Z0-9]{10,})/);
+  return {ok:hits>=2,no:m?m[1]:null};
+}
+function seatFrom(no){ // เลขที่นั่งจากหมายเลข certificate: แถว = 2 หลักท้าย, ตัวอักษร = ตัวท้ายสุด
+  if(!no)return (1+Math.floor(Math.random()*30))+'ABCDEF'[Math.floor(Math.random()*6)];
+  const d=no.replace(/\D/g,'');
+  return ((parseInt(d.slice(-2)||'0',10)%30)+1)+'ABCDEF'[no.charCodeAt(no.length-1)%6];
+}
+$('file').onchange=async e=>{
+  const files=[...e.target.files];let bad=0,dup=0;
+  for(let i=0;i<files.length;i++){
+    $('status').textContent=`กำลังตรวจ certificate ${i+1}/${files.length}...`;
+    const img=await shrink(files[i]);
+    const r=await readCert(img);
+    if(!r.ok){bad++;continue}
+    if(r.no&&tickets.some(t=>t.no===r.no)){dup++;continue}
+    tickets.unshift({img,no:r.no,seat:seatFrom(r.no),date:new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short'})});
+  }
+  const msg=[];if(bad)msg.push(`${bad} ไฟล์ไม่ใช่ MAMA voting certificate`);if(dup)msg.push(`${dup} ไฟล์ซ้ำกับที่อัปแล้ว`);
+  $('status').textContent=msg.join(' · ');
+  save('tickets',tickets);e.target.value='';render();
+};
+$('name').oninput=e=>save('name',e.target.value);
+const openP=v=>$('passport').classList.toggle('open',v);
+$('cover').onclick=()=>openP(true);$('cover').onkeydown=e=>{if(e.key==='Enter'||e.key===' ')openP(true)};
+$('close').onclick=()=>openP(false);
+$('tickets').onclick=e=>{
+  const sv=e.target.closest('[data-save]');if(sv){saveTicket(+sv.dataset.save);return}
+  const d=e.target.closest('[data-del]');
+  if(d){tickets.splice(+d.dataset.del,1);save('tickets',tickets);render();return}
+  const t=e.target.closest('.ticket');if(t)fly(+t.dataset.i);
+};
+$('tickets').onkeydown=e=>{if(e.key==='Enter'&&e.target.classList.contains('ticket'))fly(+e.target.dataset.i)};
+
+const loadImg=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
+const rrect=(x,a,b,w,h,r)=>{x.beginPath();x.roundRect?x.roundRect(a,b,w,h,r):x.rect(a,b,w,h)};
+async function saveTicket(i){ // วาดตั๋วลง canvas แล้วดาวน์โหลดเป็น PNG
+  const t=tickets[i];if(!t)return;const m=seatM(t);
+  try{await document.fonts.load('800 40px Kanit');await document.fonts.load('300 20px Kanit')}catch(e){}
+  const W=1200,H=500,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.save();rrect(x,0,0,W,H,40);x.clip();
+  x.fillStyle='#f3f6fb';x.fillRect(0,0,W,H);
+  x.fillStyle=m.c;x.fillRect(0,0,W,20);
+  const ci=await loadImg(t.img);
+  if(ci){const s=Math.min(290/ci.width,420/ci.height),w=ci.width*s,h=ci.height*s,cx=40,cy=45+(420-h)/2;
+    x.fillStyle='#fff';x.fillRect(cx-6,cy-6,w+12,h+12);x.drawImage(ci,cx,cy,w,h)}
+  x.fillStyle=m.c;x.font='700 20px Kanit,sans-serif';x.fillText('✦ RIIZE AIR · BOARDING PASS',380,95);
+  x.fillStyle='#0e1b3d';x.font='800 84px Kanit,sans-serif';x.fillText('RZ '+(100+i),380,185);
+  const f=(l,v,a,b,sz=34)=>{x.fillStyle='#6b7a99';x.font='300 18px Kanit,sans-serif';x.fillText(l,a,b);x.fillStyle='#0e1b3d';x.font='700 '+sz+'px Kanit,sans-serif';x.fillText(v,a,b+40)};
+  f('PASSENGER',(load('name','')||'RIIZE FAN').toUpperCase(),380,240);
+  f('SEAT',t.seat,380,335);f('DATE',t.date,540,335);
+  if(t.no)f('CERT NO.',t.no,380,420,26);
+  let h=0;for(const ch of (t.no||t.seat+i))h=(h*31+ch.charCodeAt(0))>>>0;
+  x.fillStyle='#0e1b3d';let bx=740;
+  for(let k=0;k<40&&bx<880;k++){h=(h*1103515245+12345)>>>0;const w=2+(h>>>16)%5;if(k%2===0)x.fillRect(bx,345,w,95);bx+=w+1}
+  x.strokeStyle='#c9d4e8';x.lineWidth=3;x.setLineDash([10,10]);x.beginPath();x.moveTo(900,40);x.lineTo(900,460);x.stroke();x.setLineDash([]);
+  x.fillStyle=m.c+'33';x.beginPath();x.arc(1050,200,88,0,7);x.fill();
+  const pi=await loadImg('img/'+m.id+'.png');
+  if(pi){const sh=195,sw=pi.width*sh/pi.height;x.drawImage(pi,1050-sw/2,288-sh,sw,sh)}
+  else{x.fillStyle=m.c;x.beginPath();x.arc(1050,200,88,0,7);x.fill();x.fillStyle='#fff';x.font='800 80px Kanit,sans-serif';x.textAlign='center';x.fillText(m.n[0],1050,228)}
+  x.textAlign='center';x.fillStyle='#0e1b3d';x.font='700 34px Kanit,sans-serif';x.fillText(m.n.toUpperCase(),1050,345);
+  x.fillStyle='#6b7a99';x.font='300 22px Kanit,sans-serif';x.fillText('SEAT '+t.seat,1050,382);
+  x.font='300 16px Kanit,sans-serif';x.fillText('BY: ONLYWONBIN TH',1050,455);x.textAlign='left';
+  x.globalCompositeOperation='destination-out';x.beginPath();x.arc(900,0,24,0,7);x.fill();x.beginPath();x.arc(900,H,24,0,7);x.fill();
+  x.restore();
+  c.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='riize-air-ticket-'+(100+i)+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)},'image/png');
+}
+let timer,audio;
+const wait=ms=>new Promise(r=>timer=setTimeout(r,ms));
+function stop(){clearTimeout(timer);if(audio){audio.pause();audio=null}speechSynthesis.cancel();$('flight').classList.remove('on')}
+$('skip').onclick=stop;
+function announce(m){
+  return new Promise(done=>{
+    $('crew').innerHTML=av(m,'big');
+    $('who').textContent='กัปตัน '+m.n;$('who').style.display='inline-block';
+    $('detail').textContent='';
+    $('msg').innerHTML=(m.o?`<div class="o">${m.o}</div>`:'')+`<div class="th">${m.th}</div>`;$('msg').style.display='block';
+    let ended=false,fb=false;const fin=()=>{if(!ended){ended=true;done()}};
+    const fallback=()=>{if(fb)return;fb=true; // ไม่มีไฟล์เสียง: ใช้เสียงอ่านของเบราว์เซอร์
+      const u=new SpeechSynthesisUtterance(m.th);u.lang='th-TH';u.onend=fin;u.onerror=fin;
+      speechSynthesis.speak(u);setTimeout(fin,9000+m.th.length*100)};
+    audio=new Audio('audio/'+m.id+'.mp3');
+    audio.onended=fin;audio.onerror=fallback;
+    audio.play().catch(fallback);
+  });
+}
+async function fly(i){
+  const t=tickets[i];if(!t)return;
+  const m=MEMBERS[Math.floor(Math.random()*MEMBERS.length)];
+  $('flight').style.setProperty('--m',m.c);
+  $('fcert').src=t.img;$('crew').innerHTML=MEMBERS.map(x=>av(x)).join('');
+  $('msg').style.display='none';$('who').style.display='none';$('tp').style.left='0';
+  $('flight').classList.add('on');
+  for(let k=0;k<STEPS.length;k++){
+    if(!$('flight').classList.contains('on'))return;
+    $('step').textContent=STEPS[k][0];$('detail').textContent=STEPS[k][1];
+    const pct=(k+1)/STEPS.length*100;
+    $('bar').style.width=pct+'%';$('tp').style.left=pct+'%';
+    $('plane').style.transform=`translateY(${-k*8}px) rotate(${k>=1&&k<=2?-8:k>=5?6:0}deg)`;
+    if(k===4){await announce(m);await wait(4000)} // ค้างข้อความไว้ให้อ่านต่ออีกนิด
+    else await wait(2500);
+  }
+  stamps.push({c:m.c,who:m.n.toUpperCase(),date:new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short'})});
+  save('stamps',stamps);
+  await wait(1800);
+  stop();$('bar').style.width='0';render();openP(true);
+}
+render();
+</script>
+</body>
+</html>
